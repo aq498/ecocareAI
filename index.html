@@ -4,23 +4,23 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>EcoLife Hub</title>
-    
+
     <script src="https://cdn.tailwindcss.com"></script>
-    
+
     <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
-    
+
     <script src="https://unpkg.com/lucide@0.292.0/dist/umd/lucide.min.js"></script>
-    
+
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-    
+
     <style>
         .hide-scrollbar::-webkit-scrollbar { display: none; }
         .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-        
+
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
         @keyframes slideUp { from { opacity: 0; transform: translateY(1rem); } to { opacity: 1; transform: translateY(0); } }
-        
+
         .fade-in { animation: fadeIn 0.5s ease-out forwards; }
         .slide-in-from-bottom-4 { animation: slideUp 0.5s ease-out forwards; }
     </style>
@@ -33,13 +33,33 @@
         const { useState, useEffect } = React;
         const { createRoot } = ReactDOM;
 
-        // Direct, safe extraction fallback for global Lucide icons
-        const icons = lucide.icons || lucide;
-        const { 
-          Leaf, Activity, RefreshCw, ScanSearch, CheckCircle, 
-          MapPin, ArrowRight, Sparkles, TrendingDown, ShoppingBag, 
-          Car, Train, Bike 
-        } = icons;
+        // Helper to safely get icons from the lucide UMD global
+        const getIcon = (name) => {
+            // Try different possible locations in the lucide global
+            const icon = lucide.icons?.[name] || lucide[name] || window.lucide?.icons?.[name] || window.lucide?.[name];
+            if (!icon) {
+                console.warn(`Icon ${name} not found in lucide`);
+                // Return a simple fallback component
+                return function FallbackIcon(props) {
+                    return React.createElement('span', { ...props, className: (props.className || '') + ' inline-block' }, '●');
+                };
+            }
+            return icon;
+        };
+
+        const Leaf = getIcon('Leaf');
+        const Activity = getIcon('Activity');
+        const RefreshCw = getIcon('RefreshCw');
+        const Search = getIcon('Search'); // Replaced ScanSearch with Search
+        const CheckCircle = getIcon('CheckCircle');
+        const MapPin = getIcon('MapPin');
+        const ArrowRight = getIcon('ArrowRight');
+        const Sparkles = getIcon('Sparkles');
+        const TrendingDown = getIcon('TrendingDown');
+        const ShoppingBag = getIcon('ShoppingBag');
+        const Car = getIcon('Car');
+        const Train = getIcon('Train');
+        const Bike = getIcon('Bike');
 
         // --- MAIN APP COMPONENT ---
         function App() {
@@ -49,19 +69,19 @@
             { id: 'dashboard', label: 'Impact Dashboard', icon: Activity },
             { id: 'habits', label: 'Habit Builder', icon: CheckCircle },
             { id: 'swap', label: 'Transit Swap', icon: RefreshCw },
-            { id: 'auditor', label: 'Eco-Auditor', icon: ScanSearch },
+            { id: 'auditor', label: 'Eco-Auditor', icon: Search },
           ];
 
           return (
             <div className="min-h-screen bg-stone-50 font-sans text-stone-800 flex flex-col md:flex-row">
-              
+
               {/* Navigation / Sidebar */}
               <nav className="bg-emerald-900 text-emerald-50 w-full md:w-64 md:min-h-screen p-4 flex flex-col shadow-lg z-10">
                 <div className="flex items-center gap-3 mb-8 px-2 pt-4">
                   <Leaf className="w-8 h-8 text-emerald-400" />
                   <h1 className="text-2xl font-bold tracking-tight text-white">EcoLife Hub</h1>
                 </div>
-                
+
                 <div className="flex md:flex-col gap-2 overflow-x-auto pb-4 md:pb-0 hide-scrollbar">
                   {navItems.map((item) => {
                     const Icon = item.icon;
@@ -262,13 +282,13 @@
                       ${habit.done ? 'bg-emerald-500 text-white' : 'bg-stone-200 text-stone-400'}`}>
                       <CheckCircle className="w-5 h-5" />
                     </div>
-                    
+
                     <div className="flex-1">
                       <p className={`font-semibold text-lg ${habit.done ? 'text-emerald-900 line-through opacity-70' : 'text-stone-700'}`}>
                         {habit.text}
                       </p>
                     </div>
-                    
+
                     <div className="flex items-center gap-1 text-amber-500 bg-amber-50 px-3 py-1 rounded-lg">
                       <TrendingDown className="w-4 h-4 transform rotate-180" />
                       <span className="font-bold">{habit.streak}</span>
@@ -276,7 +296,7 @@
                   </div>
                 ))}
               </div>
-              
+
               <button className="w-full py-4 border-2 border-dashed border-stone-200 text-stone-500 font-semibold rounded-2xl hover:border-emerald-300 hover:text-emerald-600 transition-colors">
                 + Unlock Next Habit Level
               </button>
@@ -352,7 +372,7 @@
           const handleScan = (e) => {
             e.preventDefault();
             if (!query) return;
-            
+
             setIsScanning(true);
             setResult(null);
 
@@ -407,7 +427,7 @@
                   disabled={isScanning || !query}
                   className="bg-emerald-600 text-white px-8 py-4 rounded-xl font-bold hover:bg-emerald-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
                 >
-                  {isScanning ? <RefreshCw className="animate-spin" /> : <ScanSearch />}
+                  {isScanning ? <RefreshCw className="animate-spin" /> : <Search />}
                   {isScanning ? 'Scanning...' : 'Audit'}
                 </button>
               </form>
@@ -428,7 +448,7 @@
                     <div className="absolute top-0 left-0 w-1 h-full bg-emerald-500"></div>
                     <h3 className="text-sm font-bold text-emerald-600 uppercase tracking-wider mb-1">Better Alternative</h3>
                     <p className="text-2xl font-bold text-stone-800 mb-4">{result.alternative}</p>
-                    
+
                     <ul className="space-y-2 mb-6">
                       {result.benefits.map((b, i) => (
                         <li key={i} className="flex items-center gap-2 text-stone-600">
@@ -436,7 +456,7 @@
                         </li>
                       ))}
                     </ul>
-                    
+
                     <div className="pt-4 border-t border-stone-100 flex items-center justify-between">
                       <span className="text-sm text-stone-500 flex items-center gap-1">
                         <MapPin className="w-4 h-4" /> Available locally at:
