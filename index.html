@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -6,10 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>EcoLife Hub</title>
     
-    <!-- Tailwind CSS for styling -->
     <script src="https://cdn.tailwindcss.com"></script>
     
-    <!-- Custom CSS for animations and scrollbars -->
     <style>
         .hide-scrollbar::-webkit-scrollbar { display: none; }
         .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
@@ -21,7 +18,6 @@
         .slide-in-from-bottom-4 { animation: slideUp 0.5s ease-out forwards; }
     </style>
 
-    <!-- Import Maps to load React and Icons directly in the browser -->
     <script type="importmap">
     {
         "imports": {
@@ -32,13 +28,11 @@
     }
     </script>
     
-    <!-- Babel to translate JSX code in the browser -->
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 </head>
 <body>
     <div id="root"></div>
 
-    <!-- The React Application -->
     <script type="text/babel" data-type="module">
         import React, { useState, useEffect } from 'react';
         import { createRoot } from 'react-dom/client';
@@ -235,254 +229,3 @@
           const progress = (completedCount / habits.length) * 100;
 
           return (
-            <div className="space-y-8 fade-in">
-              <div className="flex justify-between items-end">
-                <div>
-                  <h2 className="text-3xl font-bold text-stone-800 mb-2">Micro-Habit Builder</h2>
-                  <p className="text-stone-500">Focus on one small change at a time. Build your streak.</p>
-                </div>
-                <div className="text-right hidden sm:block">
-                  <p className="text-sm font-bold text-stone-400 uppercase">Daily Progress</p>
-                  <p className="text-2xl font-black text-emerald-600">{completedCount}/{habits.length}</p>
-                </div>
-              </div>
-
-              <div className="w-full bg-stone-100 rounded-full h-3 mb-8 overflow-hidden">
-                <div 
-                  className="bg-emerald-500 h-3 rounded-full transition-all duration-500 ease-out" 
-                  style={{ width: `${progress}%` }}
-                ></div>
-              </div>
-
-              <div className="space-y-3">
-                {habits.map(habit => (
-                  <div 
-                    key={habit.id}
-                    onClick={() => toggleHabit(habit.id)}
-                    className={`p-5 rounded-2xl border-2 transition-all cursor-pointer flex items-center gap-4
-                      ${habit.done 
-                        ? 'border-emerald-200 bg-emerald-50' 
-                        : 'border-stone-100 bg-white hover:border-emerald-100 hover:bg-stone-50'
-                      }`}
-                  >
-                    <div className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 transition-colors
-                      ${habit.done ? 'bg-emerald-500 text-white' : 'bg-stone-200 text-stone-400'}`}>
-                      <CheckCircle className="w-5 h-5" />
-                    </div>
-                    
-                    <div className="flex-1">
-                      <p className={`font-semibold text-lg ${habit.done ? 'text-emerald-900 line-through opacity-70' : 'text-stone-700'}`}>
-                        {habit.text}
-                      </p>
-                    </div>
-                    
-                    <div className="flex items-center gap-1 text-amber-500 bg-amber-50 px-3 py-1 rounded-lg">
-                      <TrendingDown className="w-4 h-4 transform rotate-180" />
-                      <span className="font-bold">{habit.streak}</span>
-                    </div>
-                  </div>
-                ))}
-              </div>
-              
-              <button className="w-full py-4 border-2 border-dashed border-stone-200 text-stone-500 font-semibold rounded-2xl hover:border-emerald-300 hover:text-emerald-600 transition-colors">
-                + Unlock Next Habit Level
-              </button>
-            </div>
-          );
-        }
-
-        // --- FEATURE 3: SWAP BOARD ---
-        function SwapBoard() {
-          const [station, setStation] = useState('Central Station');
-          
-          const mockItems = [
-            { id: 1, title: "Calculus Textbook", station: "Central Station", user: "Alex T.", type: "Giveaway" },
-            { id: 2, title: "Monstera Plant Cutting", station: "Central Station", user: "Sam R.", type: "Swap" },
-            { id: 3, title: "Acoustic Guitar", station: "North Line Stop", user: "Jordan", type: "Giveaway" },
-          ];
-
-          const filteredItems = mockItems.filter(item => item.station === station);
-
-          return (
-            <div className="space-y-8 fade-in">
-              <div>
-                <h2 className="text-3xl font-bold text-stone-800 mb-2">Transit Swap Board</h2>
-                <p className="text-stone-500">Find and exchange items with people along your daily commute route.</p>
-              </div>
-
-              <div className="bg-stone-50 p-4 rounded-2xl border border-stone-200 flex gap-4 items-center">
-                <MapPin className="text-emerald-600 flex-shrink-0" />
-                <select 
-                  value={station}
-                  onChange={(e) => setStation(e.target.value)}
-                  className="bg-transparent text-lg font-bold text-stone-800 outline-none w-full cursor-pointer"
-                >
-                  <option>Central Station</option>
-                  <option>North Line Stop</option>
-                  <option>University Campus</option>
-                </select>
-              </div>
-
-              <div className="grid md:grid-cols-2 gap-4">
-                {filteredItems.length > 0 ? filteredItems.map(item => (
-                  <div key={item.id} className="p-5 border border-stone-100 rounded-2xl shadow-sm hover:shadow-md transition-shadow bg-white flex flex-col justify-between">
-                    <div>
-                      <div className="flex justify-between items-start mb-2">
-                        <span className={`text-xs font-bold px-2 py-1 rounded uppercase tracking-wide
-                          ${item.type === 'Giveaway' ? 'bg-blue-100 text-blue-700' : 'bg-purple-100 text-purple-700'}
-                        `}>
-                          {item.type}
-                        </span>
-                        <span className="text-sm text-stone-400">@ {item.user}</span>
-                      </div>
-                      <h3 className="text-xl font-bold text-stone-800 mb-4">{item.title}</h3>
-                    </div>
-                    <button className="w-full py-2 bg-stone-900 text-white rounded-lg font-medium hover:bg-emerald-600 transition-colors flex items-center justify-center gap-2">
-                      Claim at {station} <ArrowRight className="w-4 h-4" />
-                    </button>
-                  </div>
-                )) : (
-                  <div className="col-span-2 text-center py-12 text-stone-400">
-                    No items currently listed at {station}. Be the first to post!
-                  </div>
-                )}
-              </div>
-            </div>
-          );
-        }
-
-// --- FEATURE 4: ECO-AUDITOR (GLOBAL ACCESS VIA PROXY) ---
-        function EcoAuditor() {
-          const [query, setQuery] = useState('');
-          const [isScanning, setIsScanning] = useState(false);
-          const [result, setResult] = useState(null);
-          const [error, setError] = useState(null);
-
-          const DEEPSEEK_API_KEY = "sk-517b3eac91cb4f49908d226cee8dbddd"; 
-
-          const handleScan = async (e) => {
-            e.preventDefault();
-            if (!query) return;
-            
-            setIsScanning(true);
-            setResult(null);
-            setError(null);
-
-            const systemPrompt = `You are an expert environmental auditor. The user will input a consumer product or material. 
-            Analyze its environmental footprint and return a JSON object with exactly the following keys:
-            - original: (string)
-            - issue: (string)
-            - alternative: (string)
-            - benefits: (array of strings, exactly 2 or 3 bullet points)
-            - localStore: (string)
-            Do not include any chat formatting, reasoning tags, or markdown outside of pure JSON.`;
-
-          try {
-              // Target DeepSeek URL directly through the raw AllOrigins passthrough proxy
-              const targetUrl = encodeURIComponent("https://api.deepseek.com/chat/completions");
-              
-              const response = await fetch(`https://api.allorigins.win/raw?url=${targetUrl}`, {
-                method: "POST",
-                headers: {
-                  "Content-Type": "application/json",
-                  "Authorization": `Bearer ${DEEPSEEK_API_KEY}`
-                },
-                body: JSON.stringify({
-                  model: "deepseek-v4-flash",
-                  messages: [
-                    { role: "system", content: systemPrompt },
-                    { role: "user", content: query }
-                  ],
-                  response_format: { type: "json_object" },
-                  temperature: 0.3
-                })
-              });
-
-              if (!response.ok) throw new Error("API verification failed.");
-
-              const data = await response.json();
-              const auditData = JSON.parse(data.choices[0].message.content);
-              setResult(auditData);
-
-            } catch (err) {
-              console.error(err);
-              setError("The AI Auditor is busy or the request timed out. Please check your internet connection and try again.");
-            }
-              
-          return (
-            <div className="space-y-8 fade-in">
-              <div>
-                <h2 className="text-3xl font-bold text-stone-800 mb-2 flex items-center gap-2">
-                  AI Eco-Auditor <Sparkles className="text-emerald-500 w-6 h-6" />
-                </h2>
-                <p className="text-stone-500">Type any purchase to discover its environmental cost and green alternatives.</p>
-              </div>
-
-              <form onSubmit={handleScan} className="flex gap-2">
-                <input 
-                  type="text" 
-                  value={query}
-                  onChange={(e) => setQuery(e.target.value)}
-                  placeholder="e.g., Coffee Pods, Fast Fashion Jeans..." 
-                  className="flex-1 p-4 rounded-xl border border-stone-200 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none text-lg"
-                />
-                <button 
-                  disabled={isScanning || !query}
-                  className="bg-emerald-600 text-white px-8 py-4 rounded-xl font-bold hover:bg-emerald-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
-                >
-                  {isScanning ? <RefreshCw className="animate-spin" /> : <ScanSearch />}
-                  {isScanning ? 'Auditing...' : 'Audit'}
-                </button>
-              </form>
-
-              {error && (
-                <div className="p-4 bg-rose-50 text-rose-700 rounded-xl border border-rose-100 text-sm">
-                  ⚠️ {error} <br />
-                  <span className="text-xs text-stone-500">Note for testing: Please open <a href="https://cors-anywhere.herokuapp.com/" target="_blank" className="underline text-blue-600">cors-anywhere.herokuapp.com</a> and click "Request temporary access" to unlock the demo API network path.</span>
-                </div>
-              )}
-
-              {result && (
-                <div className="bg-emerald-50 rounded-2xl p-6 md:p-8 border border-emerald-100 slide-in-from-bottom-4">
-                  <div className="flex items-start gap-4 mb-6">
-                    <div className="bg-white p-3 rounded-xl shadow-sm text-amber-500">
-                      <Activity className="w-6 h-6" />
-                    </div>
-                    <div>
-                      <h3 className="text-sm font-bold text-stone-400 uppercase tracking-wider mb-1">The Issue with {result.original}</h3>
-                      <p className="text-stone-700">{result.issue}</p>
-                    </div>
-                  </div>
-
-                  <div className="bg-white rounded-xl p-6 border border-emerald-200 shadow-sm relative overflow-hidden">
-                    <div className="absolute top-0 left-0 w-1 h-full bg-emerald-500"></div>
-                    <h3 className="text-sm font-bold text-emerald-600 uppercase tracking-wider mb-1">Better Alternative</h3>
-                    <p className="text-2xl font-bold text-stone-800 mb-4">{result.alternative}</p>
-                    
-                    <ul className="space-y-2 mb-6">
-                      {result.benefits && result.benefits.map((b, i) => (
-                        <li key={i} className="flex items-center gap-2 text-stone-600">
-                          <CheckCircle className="w-4 h-4 text-emerald-500" /> {b}
-                        </li>
-                      ))}
-                    </ul>
-                    
-                    <div className="pt-4 border-t border-stone-100 flex items-center justify-between">
-                      <span className="text-sm text-stone-500 flex items-center gap-1">
-                        <MapPin className="w-4 h-4" /> Available locally at:
-                      </span>
-                      <span className="font-bold text-emerald-700">{result.localStore}</span>
-                    </div>
-                  </div>
-                </div>
-              )}
-            </div>
-          );
-        }
-
-        // Initialize React App
-        const root = createRoot(document.getElementById('root'));
-        root.render(<App />);
-    </script>
-</body>
-</html>
