@@ -1,0 +1,493 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EcoLife Hub</title>
+    
+    <!-- Tailwind CSS for styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Custom CSS for animations and scrollbars -->
+    <style>
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(1rem); } to { opacity: 1; transform: translateY(0); } }
+        
+        .fade-in { animation: fadeIn 0.5s ease-out forwards; }
+        .slide-in-from-bottom-4 { animation: slideUp 0.5s ease-out forwards; }
+    </style>
+
+    <!-- Import Maps to load React and Icons directly in the browser -->
+    <script type="importmap">
+    {
+        "imports": {
+            "react": "https://esm.sh/react@18.2.0",
+            "react-dom/client": "https://esm.sh/react-dom@18.2.0/client",
+            "lucide-react": "https://esm.sh/lucide-react@0.292.0"
+        }
+    }
+    </script>
+    
+    <!-- Babel to translate JSX code in the browser -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+</head>
+<body>
+    <div id="root"></div>
+
+    <!-- The React Application -->
+    <script type="text/babel" data-type="module">
+        import React, { useState, useEffect } from 'react';
+        import { createRoot } from 'react-dom/client';
+        import { 
+          Leaf, Activity, RefreshCw, ScanSearch, CheckCircle, 
+          MapPin, ArrowRight, Sparkles, TrendingDown, ShoppingBag, 
+          Car, Train, Bike 
+        } from 'lucide-react';
+
+        // --- MAIN APP COMPONENT ---
+        function App() {
+          const [activeTab, setActiveTab] = useState('dashboard');
+
+          const navItems = [
+            { id: 'dashboard', label: 'Impact Dashboard', icon: Activity },
+            { id: 'habits', label: 'Habit Builder', icon: CheckCircle },
+            { id: 'swap', label: 'Transit Swap', icon: RefreshCw },
+            { id: 'auditor', label: 'Eco-Auditor', icon: ScanSearch },
+          ];
+
+          return (
+            <div className="min-h-screen bg-stone-50 font-sans text-stone-800 flex flex-col md:flex-row">
+              
+              {/* Navigation / Sidebar */}
+              <nav className="bg-emerald-900 text-emerald-50 w-full md:w-64 md:min-h-screen p-4 flex flex-col shadow-lg z-10">
+                <div className="flex items-center gap-3 mb-8 px-2 pt-4">
+                  <Leaf className="w-8 h-8 text-emerald-400" />
+                  <h1 className="text-2xl font-bold tracking-tight text-white">EcoLife Hub</h1>
+                </div>
+                
+                <div className="flex md:flex-col gap-2 overflow-x-auto pb-4 md:pb-0 hide-scrollbar">
+                  {navItems.map((item) => {
+                    const Icon = item.icon;
+                    const isActive = activeTab === item.id;
+                    return (
+                      <button
+                        key={item.id}
+                        onClick={() => setActiveTab(item.id)}
+                        className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all whitespace-nowrap md:whitespace-normal
+                          ${isActive 
+                            ? 'bg-emerald-800 text-white shadow-inner' 
+                            : 'text-emerald-200 hover:bg-emerald-800/50 hover:text-white'
+                          }`}
+                      >
+                        <Icon className={`w-5 h-5 ${isActive ? 'text-emerald-400' : ''}`} />
+                        <span className="font-medium">{item.label}</span>
+                      </button>
+                    );
+                  })}
+                </div>
+              </nav>
+
+              {/* Main Content Area */}
+              <main className="flex-1 p-4 md:p-8 max-w-5xl mx-auto w-full">
+                <div className="bg-white rounded-3xl shadow-sm border border-stone-100 p-6 md:p-8 min-h-[80vh]">
+                  {activeTab === 'dashboard' && <CarbonDashboard />}
+                  {activeTab === 'habits' && <HabitBuilder />}
+                  {activeTab === 'swap' && <SwapBoard />}
+                  {activeTab === 'auditor' && <EcoAuditor />}
+                </div>
+              </main>
+            </div>
+          );
+        }
+
+        // --- FEATURE 1: IMPACT DASHBOARD ---
+        function CarbonDashboard() {
+          const [transport, setTransport] = useState('car');
+          const [diet, setDiet] = useState('omnivore');
+          const [energy, setEnergy] = useState(50);
+
+          const getScore = () => {
+            let score = 0;
+            score += transport === 'car' ? 40 : transport === 'transit' ? 15 : 0;
+            score += diet === 'meat' ? 40 : diet === 'omnivore' ? 25 : diet === 'veg' ? 10 : 5;
+            score += energy * 0.2;
+            return Math.min(100, Math.max(0, score));
+          };
+
+          const score = getScore();
+          const getScoreColor = () => {
+            if (score < 30) return 'text-emerald-500';
+            if (score < 60) return 'text-amber-500';
+            return 'text-rose-500';
+          };
+
+          return (
+            <div className="space-y-8 fade-in">
+              <div>
+                <h2 className="text-3xl font-bold text-stone-800 mb-2">Daily Impact Simulator</h2>
+                <p className="text-stone-500">Tweak your daily habits to see real-time changes to your carbon footprint.</p>
+              </div>
+
+              <div className="grid md:grid-cols-2 gap-12">
+                <div className="space-y-6">
+                  <div className="space-y-3">
+                    <label className="font-semibold text-stone-700 flex items-center gap-2">
+                      <Car className="w-4 h-4 text-emerald-600" /> Commute Method
+                    </label>
+                    <div className="grid grid-cols-3 gap-2">
+                      {[
+                        { id: 'car', icon: Car, label: 'Car' },
+                        { id: 'transit', icon: Train, label: 'Transit' },
+                        { id: 'bike', icon: Bike, label: 'Bike/Walk' }
+                      ].map(t => (
+                        <button 
+                          key={t.id}
+                          onClick={() => setTransport(t.id)}
+                          className={`p-3 rounded-xl border flex flex-col items-center gap-2 transition-all ${transport === t.id ? 'bg-emerald-50 border-emerald-500 text-emerald-700 shadow-sm' : 'border-stone-200 hover:border-emerald-300 text-stone-500'}`}
+                        >
+                          <t.icon className="w-5 h-5" />
+                          <span className="text-xs font-medium">{t.label}</span>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="space-y-3">
+                    <label className="font-semibold text-stone-700 flex items-center gap-2">
+                      <ShoppingBag className="w-4 h-4 text-emerald-600" /> Daily Diet
+                    </label>
+                    <select 
+                      value={diet} 
+                      onChange={(e) => setDiet(e.target.value)}
+                      className="w-full p-3 rounded-xl border border-stone-200 bg-white focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none"
+                    >
+                      <option value="meat">Meat Heavy</option>
+                      <option value="omnivore">Average Omnivore</option>
+                      <option value="veg">Vegetarian</option>
+                      <option value="vegan">Vegan</option>
+                    </select>
+                  </div>
+
+                  <div className="space-y-3">
+                    <label className="font-semibold text-stone-700 flex justify-between">
+                      <span className="flex items-center gap-2"><Activity className="w-4 h-4 text-emerald-600" /> Home Energy Use</span>
+                      <span className="text-stone-400 text-sm">{energy}%</span>
+                    </label>
+                    <input 
+                      type="range" 
+                      min="0" 
+                      max="100" 
+                      value={energy} 
+                      onChange={(e) => setEnergy(e.target.value)}
+                      className="w-full accent-emerald-600"
+                    />
+                  </div>
+                </div>
+
+                <div className="bg-stone-50 rounded-2xl p-8 flex flex-col items-center justify-center text-center border border-stone-100">
+                  <div className="relative w-48 h-48 flex items-center justify-center mb-6">
+                    <svg className="w-full h-full transform -rotate-90" viewBox="0 0 100 100">
+                      <circle cx="50" cy="50" r="45" fill="none" stroke="#e7e5e4" strokeWidth="8" />
+                      <circle 
+                        cx="50" cy="50" r="45" fill="none" 
+                        stroke={score < 30 ? '#10b981' : score < 60 ? '#f59e0b' : '#f43f5e'} 
+                        strokeWidth="8" 
+                        strokeDasharray="283" 
+                        strokeDashoffset={283 - (283 * (100 - score)) / 100} 
+                        className="transition-all duration-1000 ease-out"
+                      />
+                    </svg>
+                    <div className="absolute inset-0 flex flex-col items-center justify-center">
+                      <span className={`text-5xl font-black ${getScoreColor()}`}>{Math.round(score)}</span>
+                      <span className="text-stone-400 text-xs font-bold uppercase tracking-wider mt-1">Impact Score</span>
+                    </div>
+                  </div>
+                  <p className="text-stone-600 font-medium">
+                    {score < 30 ? "Amazing! You're living a highly sustainable lifestyle today." 
+                    : score < 60 ? "Good effort! There's a little room for improvement." 
+                    : "High impact. Try adjusting your transport or diet."}
+                  </p>
+                </div>
+              </div>
+            </div>
+          );
+        }
+
+        // --- FEATURE 2: HABIT BUILDER ---
+        function HabitBuilder() {
+          const [habits, setHabits] = useState([
+            { id: 1, text: "Bring reusable water bottle", done: false, streak: 12 },
+            { id: 2, text: "Turn off lights when leaving room", done: true, streak: 5 },
+            { id: 3, text: "Sort recycling (Type #1 and #2)", done: false, streak: 0 },
+          ]);
+
+          const toggleHabit = (id) => {
+            setHabits(habits.map(h => 
+              h.id === id ? { ...h, done: !h.done, streak: !h.done ? h.streak + 1 : h.streak - 1 } : h
+            ));
+          };
+
+          const completedCount = habits.filter(h => h.done).length;
+          const progress = (completedCount / habits.length) * 100;
+
+          return (
+            <div className="space-y-8 fade-in">
+              <div className="flex justify-between items-end">
+                <div>
+                  <h2 className="text-3xl font-bold text-stone-800 mb-2">Micro-Habit Builder</h2>
+                  <p className="text-stone-500">Focus on one small change at a time. Build your streak.</p>
+                </div>
+                <div className="text-right hidden sm:block">
+                  <p className="text-sm font-bold text-stone-400 uppercase">Daily Progress</p>
+                  <p className="text-2xl font-black text-emerald-600">{completedCount}/{habits.length}</p>
+                </div>
+              </div>
+
+              <div className="w-full bg-stone-100 rounded-full h-3 mb-8 overflow-hidden">
+                <div 
+                  className="bg-emerald-500 h-3 rounded-full transition-all duration-500 ease-out" 
+                  style={{ width: `${progress}%` }}
+                ></div>
+              </div>
+
+              <div className="space-y-3">
+                {habits.map(habit => (
+                  <div 
+                    key={habit.id}
+                    onClick={() => toggleHabit(habit.id)}
+                    className={`p-5 rounded-2xl border-2 transition-all cursor-pointer flex items-center gap-4
+                      ${habit.done 
+                        ? 'border-emerald-200 bg-emerald-50' 
+                        : 'border-stone-100 bg-white hover:border-emerald-100 hover:bg-stone-50'
+                      }`}
+                  >
+                    <div className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 transition-colors
+                      ${habit.done ? 'bg-emerald-500 text-white' : 'bg-stone-200 text-stone-400'}`}>
+                      <CheckCircle className="w-5 h-5" />
+                    </div>
+                    
+                    <div className="flex-1">
+                      <p className={`font-semibold text-lg ${habit.done ? 'text-emerald-900 line-through opacity-70' : 'text-stone-700'}`}>
+                        {habit.text}
+                      </p>
+                    </div>
+                    
+                    <div className="flex items-center gap-1 text-amber-500 bg-amber-50 px-3 py-1 rounded-lg">
+                      <TrendingDown className="w-4 h-4 transform rotate-180" />
+                      <span className="font-bold">{habit.streak}</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+              
+              <button className="w-full py-4 border-2 border-dashed border-stone-200 text-stone-500 font-semibold rounded-2xl hover:border-emerald-300 hover:text-emerald-600 transition-colors">
+                + Unlock Next Habit Level
+              </button>
+            </div>
+          );
+        }
+
+        // --- FEATURE 3: SWAP BOARD ---
+        function SwapBoard() {
+          const [station, setStation] = useState('Central Station');
+          
+          const mockItems = [
+            { id: 1, title: "Calculus Textbook", station: "Central Station", user: "Alex T.", type: "Giveaway" },
+            { id: 2, title: "Monstera Plant Cutting", station: "Central Station", user: "Sam R.", type: "Swap" },
+            { id: 3, title: "Acoustic Guitar", station: "North Line Stop", user: "Jordan", type: "Giveaway" },
+          ];
+
+          const filteredItems = mockItems.filter(item => item.station === station);
+
+          return (
+            <div className="space-y-8 fade-in">
+              <div>
+                <h2 className="text-3xl font-bold text-stone-800 mb-2">Transit Swap Board</h2>
+                <p className="text-stone-500">Find and exchange items with people along your daily commute route.</p>
+              </div>
+
+              <div className="bg-stone-50 p-4 rounded-2xl border border-stone-200 flex gap-4 items-center">
+                <MapPin className="text-emerald-600 flex-shrink-0" />
+                <select 
+                  value={station}
+                  onChange={(e) => setStation(e.target.value)}
+                  className="bg-transparent text-lg font-bold text-stone-800 outline-none w-full cursor-pointer"
+                >
+                  <option>Central Station</option>
+                  <option>North Line Stop</option>
+                  <option>University Campus</option>
+                </select>
+              </div>
+
+              <div className="grid md:grid-cols-2 gap-4">
+                {filteredItems.length > 0 ? filteredItems.map(item => (
+                  <div key={item.id} className="p-5 border border-stone-100 rounded-2xl shadow-sm hover:shadow-md transition-shadow bg-white flex flex-col justify-between">
+                    <div>
+                      <div className="flex justify-between items-start mb-2">
+                        <span className={`text-xs font-bold px-2 py-1 rounded uppercase tracking-wide
+                          ${item.type === 'Giveaway' ? 'bg-blue-100 text-blue-700' : 'bg-purple-100 text-purple-700'}
+                        `}>
+                          {item.type}
+                        </span>
+                        <span className="text-sm text-stone-400">@ {item.user}</span>
+                      </div>
+                      <h3 className="text-xl font-bold text-stone-800 mb-4">{item.title}</h3>
+                    </div>
+                    <button className="w-full py-2 bg-stone-900 text-white rounded-lg font-medium hover:bg-emerald-600 transition-colors flex items-center justify-center gap-2">
+                      Claim at {station} <ArrowRight className="w-4 h-4" />
+                    </button>
+                  </div>
+                )) : (
+                  <div className="col-span-2 text-center py-12 text-stone-400">
+                    No items currently listed at {station}. Be the first to post!
+                  </div>
+                )}
+              </div>
+            </div>
+          );
+        }
+
+// --- FEATURE 4: ECO-AUDITOR (INTEGRATED WITH DEEPSEEK API) ---
+        function EcoAuditor() {
+          const [query, setQuery] = useState('');
+          const [isScanning, setIsScanning] = useState(false);
+          const [result, setResult] = useState(null);
+          const [error, setError] = useState(null);
+
+          // 🔴 PLACE YOUR DEEPSEEK API KEY HERE FOR TEST/DEMO PURPOSES
+          const DEEPSEEK_API_KEY = "sk-517b3eac91cb4f49908d226cee8dbddd"; 
+
+          const handleScan = async (e) => {
+            e.preventDefault();
+            if (!query) return;
+            
+            setIsScanning(true);
+            setResult(null);
+            setError(null);
+
+            // Constructing a strict system prompt to force a clean JSON response
+            const systemPrompt = `You are an expert environmental auditor. The user will input a consumer product or material. 
+            Analyze its environmental footprint and return a JSON object with exactly the following keys:
+            - original: (string, the name of the product checked)
+            - issue: (string, a brief 1-2 sentence explanation of its main environmental or carbon impact)
+            - alternative: (string, the name of a highly sustainable, eco-friendly product replacement)
+            - benefits: (array of strings, exactly 2 or 3 bullet points detailing why the alternative is better)
+            - localStore: (string, a generalized location format where someone could find it locally, e.g., "Local Zero-Waste Store or Co-op")
+            
+            Do not include any chat formatting, reasoning tags, or markdown outside of the pure JSON format.`;
+
+            try {
+              const response = await fetch("https://api.deepseek.com/chat/completions", {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                  "Authorization": `Bearer ${DEEPSEEK_API_KEY}`
+                },
+                body: JSON.stringify({
+                  model: "deepseek-v4-flash", // Using the 2026 high-speed flash model
+                  messages: [
+                    { role: "system", content: systemPrompt },
+                    { role: "user", content: query }
+                  ],
+                  response_format: { type: "json_object" }, // Enforces a solid structural object return
+                  temperature: 0.3
+                })
+              });
+
+              if (!response.ok) {
+                throw new Error(`API Error: ${response.status} - Verification failed.`);
+              }
+
+              const data = await response.json();
+              // Parse the raw text content string into an accessible JavaScript object
+              const auditData = JSON.parse(data.choices[0].message.content);
+              setResult(auditData);
+
+            } catch (err) {
+              console.error(err);
+              setError("Could not connect to the auditor AI. Please ensure your API key is valid.");
+            } finally {
+              setIsScanning(false);
+            }
+          };
+
+          return (
+            <div className="space-y-8 fade-in">
+              <div>
+                <h2 className="text-3xl font-bold text-stone-800 mb-2 flex items-center gap-2">
+                  AI Eco-Auditor <Sparkles className="text-emerald-500 w-6 h-6" />
+                </h2>
+                <p className="text-stone-500">Powered by DeepSeek AI. Type any purchase to discover its environmental cost and instant green alternatives.</p>
+              </div>
+
+              <form onSubmit={handleScan} className="flex gap-2">
+                <input 
+                  type="text" 
+                  value={query}
+                  onChange={(e) => setQuery(e.target.value)}
+                  placeholder="e.g., K-Cup Coffee Pods, Fast Fashion Jeans, Disposable Wipes..." 
+                  className="flex-1 p-4 rounded-xl border border-stone-200 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none text-lg"
+                />
+                <button 
+                  disabled={isScanning || !query}
+                  className="bg-emerald-600 text-white px-8 py-4 rounded-xl font-bold hover:bg-emerald-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                >
+                  {isScanning ? <RefreshCw className="animate-spin" /> : <ScanSearch />}
+                  {isScanning ? 'Auditing...' : 'Audit'}
+                </button>
+              </form>
+
+              {error && (
+                <div className="p-4 bg-rose-50 text-rose-700 rounded-xl border border-rose-100 text-sm">
+                  ⚠️ {error}
+                </div>
+              )}
+
+              {result && (
+                <div className="bg-emerald-50 rounded-2xl p-6 md:p-8 border border-emerald-100 slide-in-from-bottom-4">
+                  <div className="flex items-start gap-4 mb-6">
+                    <div className="bg-white p-3 rounded-xl shadow-sm text-amber-500">
+                      <Activity className="w-6 h-6" />
+                    </div>
+                    <div>
+                      <h3 className="text-sm font-bold text-stone-400 uppercase tracking-wider mb-1">The Issue with {result.original}</h3>
+                      <p className="text-stone-700">{result.issue}</p>
+                    </div>
+                  </div>
+
+                  <div className="bg-white rounded-xl p-6 border border-emerald-200 shadow-sm relative overflow-hidden">
+                    <div className="absolute top-0 left-0 w-1 h-full bg-emerald-500"></div>
+                    <h3 className="text-sm font-bold text-emerald-600 uppercase tracking-wider mb-1">Better Alternative</h3>
+                    <p className="text-2xl font-bold text-stone-800 mb-4">{result.alternative}</p>
+                    
+                    <ul className="space-y-2 mb-6">
+                      {result.benefits && result.benefits.map((b, i) => (
+                        <li key={i} className="flex items-center gap-2 text-stone-600">
+                          <CheckCircle className="w-4 h-4 text-emerald-500" /> {b}
+                        </li>
+                      ))}
+                    </ul>
+                    
+                    <div className="pt-4 border-t border-stone-100 flex items-center justify-between">
+                      <span className="text-sm text-stone-500 flex items-center gap-1">
+                        <MapPin className="w-4 h-4" /> Available locally at:
+                      </span>
+                      <span className="font-bold text-emerald-700">{result.localStore}</span>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+          );
+        }
+
+        // Initialize React App
+        const root = createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>
