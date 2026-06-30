@@ -377,14 +377,15 @@
             - localStore: (string)
             Do not include any chat formatting, reasoning tags, or markdown outside of pure JSON.`;
 
-            try {
-              // We route the request through a public CORS proxy to bypass browser security restrictions globally
-              const response = await fetch("https://cors-anywhere.herokuapp.com/https://api.deepseek.com/chat/completions", {
+          try {
+              // Target DeepSeek URL directly through the raw AllOrigins passthrough proxy
+              const targetUrl = encodeURIComponent("https://api.deepseek.com/chat/completions");
+              
+              const response = await fetch(`https://api.allorigins.win/raw?url=${targetUrl}`, {
                 method: "POST",
                 headers: {
                   "Content-Type": "application/json",
-                  "Authorization": `Bearer ${DEEPSEEK_API_KEY}`,
-                  "X-Requested-With": "XMLHttpRequest"
+                  "Authorization": `Bearer ${DEEPSEEK_API_KEY}`
                 },
                 body: JSON.stringify({
                   model: "deepseek-v4-flash",
@@ -404,12 +405,10 @@
               setResult(auditData);
 
             } catch (err) {
-              setError("Could not connect to the auditor AI. Please ensure you have requested temporary access at https://cors-anywhere.herokuapp.com/");
-            } finally {
-              setIsScanning(false);
+              console.error(err);
+              setError("The AI Auditor is busy or the request timed out. Please check your internet connection and try again.");
             }
-          };
-
+              
           return (
             <div className="space-y-8 fade-in">
               <div>
